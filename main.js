@@ -19,6 +19,9 @@ const player = {
 //create empty matrix filled with zero
 const arena = createMatrix(12,20);  
 
+let drawCounter = 0;
+let drawInterval = 1000; //1000 is one sec
+let lastTime =0;
 
 //*********************functions*********************//
 function createMatrix(w,h){
@@ -77,15 +80,17 @@ function collide(arena,player){
         for(let j=0; j<ma[i].length; j++){
             //matrix element is not zero
             //arena is not zero
-            // if column, row do not exist, means out of canvas, also count as collide
-            if(i+pos.y>19){
-                console.log('outof boundary');
+            // if row do not exist, means out of canvas
+            if(!arena[i+pos.y]){
+                console.log('out of bottom boundary');
                 return true;
 
-            }else{
-                console.log('within boundary');
+            }
+            else{
                 if ((ma[i][j] !==0) &&(arena[i+pos.y][j+pos.x] !==0)){
- 
+                    //when out of bound arena[i+pos.y][j+pos.x] is undefined
+                    console.log('colliding....');
+                    
                     return true;
                 }else{
                     continue;
@@ -104,6 +109,7 @@ function playerDrop(){
     player.pos.y+=1;
     drawCounter = 0;
 
+
     if(collide(arena,player)){ 
         player.pos.y--;
         merge(arena,player);
@@ -115,10 +121,45 @@ function playerDrop(){
 function playerMove(dir){
     player.pos.x+=dir
     if(collide(arena,player)){ 
+        console.log('colliding left/right');
         player.pos.x-=dir
     }
     
 }
+
+function rotate(matrix,dir){
+    for(i=0; i<matrix.length; i++){
+        for(j=0; j<i; j++){
+            [
+                matrix[i][j],
+                matrix[j][i]
+            ]=
+            [
+                matrix[j][i],
+                matrix[i][j]
+            ]
+        }
+    }
+
+    if(dir>0){
+        matrix.forEach(row=>row.reverse());
+        
+    }else if(dir<0){
+        matrix.reverse()
+    }
+}
+
+function playerRotate(dir){
+
+    rotate(player.matrix,dir);
+
+    if(collide(arena,player)){ 
+        console.log('colliding not not able to rotate');
+        rotate(player.matrix,-dir);
+    }
+
+}
+
 function draw(player){
     //only draw inside canvas size
 
@@ -129,9 +170,6 @@ function draw(player){
     
 }
 
-let drawCounter = 0;
-let drawInterval = 1000; //1000 is one sec
-let lastTime =0;
 
 function update(time=0){
     const dt = time - lastTime;
@@ -139,14 +177,7 @@ function update(time=0){
 
     //update every one sec
     if(drawCounter > drawInterval){
-        console.log('updating...');
-        console.log('player.pos.x...');
-        console.log(player.pos.x);
-        console.log('player.pos.y...');
-        console.log(player.pos.y);
         playerDrop();
-       
-        
         console.table(arena);
     }
     
@@ -173,6 +204,12 @@ document.addEventListener('keydown', event=>{
    
     }else if(event.keyCode == 40){
         playerDrop();
+    }else if(event.keyCode == 40){
+        playerDrop();
+    }else if(event.keyCode == 81){
+        playerRotate(-1);
+    }else if(event.keyCode == 87){
+        playerRotate(1);
     }
 })
 update();
