@@ -9,10 +9,22 @@ const matrix_t =[
     [0,1,0],
 ];
 
-const player = {
-    pos: {x:0,y:0},
+const player ={
     matrix: matrix_t,
-}
+    pos: {x:5,y:5}
+
+};
+
+const colors =[
+    null,
+    'red',
+    'blue',
+    'violet',
+    'green',
+    'purple',
+    'orange',
+    'pink',
+];
 
 //canvas width is 240, height is 400. We want to divide canvas by matrix. 
 //Since scale is 20, the matrix is 12 * 20
@@ -32,6 +44,81 @@ function createMatrix(w,h){
     return matrix;
 }
 
+
+function createPiece(type)
+{
+    if (type === 'I') {
+        return [
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+            [0, 1, 0, 0],
+        ];
+    } else if (type === 'L') {
+        return [
+            [0, 2, 0],
+            [0, 2, 0],
+            [0, 2, 2],
+        ];
+    } else if (type === 'J') {
+        return [
+            [0, 3, 0],
+            [0, 3, 0],
+            [3, 3, 0],
+        ];
+    } else if (type === 'O') {
+        return [
+            [4, 4],
+            [4, 4],
+        ];
+    } else if (type === 'Z') {
+        return [
+            [5, 5, 0],
+            [0, 5, 5],
+            [0, 0, 0],
+        ];
+    } else if (type === 'S') {
+        return [
+            [0, 6, 6],
+            [6, 6, 0],
+            [0, 0, 0],
+        ];
+    } else if (type === 'T') {
+        return [
+            [0, 7, 0],
+            [7, 7, 7],
+            [0, 0, 0],
+        ];
+    }
+}
+
+function playerReset(){
+    const pieces = 'ILJOTSZ';
+    player.matrix = createPiece(pieces[Math.floor(pieces.length*Math.random())])
+    player.pos.x = Math.floor(arena.length / 2) - Math.floor(player.matrix[0].length);
+    player.pos.y = 0;
+
+    if(collide(arena,player)){
+        console.log('full..........');
+        arena.forEach(row=>row.fill(0));
+    }
+
+}
+
+function cancelRow(){
+    outer: for(let row=arena.length-1; row>=0; row--){
+        for(let col=0; col<arena[row].length; col++){
+            if(arena[row][col]===0){
+                continue outer;
+            }
+        }
+        //if not found 0
+        const deletedRow = arena.splice(row,1)[0].fill(0);
+        arena.unshift(deletedRow); // put on top of the arena matrix
+        row++;
+
+    }
+}
 //Draw player's matrix
 //Iterate matrix by row and then by column
 //Value is matrix[rowIndex][colIndex]
@@ -43,7 +130,7 @@ function drawMatrix(matrixName,offset){
     matrixName.forEach((x,rowIndex)=>{
         x.forEach((value,columnIndex)=>{
             if(value!==0){
-                context.fillStyle ='blue';
+                context.fillStyle =colors[value];
                 //because coordinates of canvas is mirror y=x
                 context.fillRect(
                     columnIndex+offset.x,
@@ -71,24 +158,17 @@ function merge(arena,player){
     });
 
 }
-
+//search which tile in matrix collide with tile in arena
 function collide(arena,player){
     const [ma,pos] = [player.matrix,player.pos];
   
     for(let i=0; i<ma.length; i++){
         for(let j=0; j<ma[i].length; j++){
-            console.log([i,j]);
-            console.log('matrix value...');
-            console.log(ma[i][j]);
-    
-
             // if row do not exist, means out of canvas
             if(!arena[i+pos.y]){
-                console.log('out of bottom boundary');
-
                 if (ma[i][j] !==0){
                     //when out of bound arena[i+pos.y][j+pos.x] is undefined
-                    console.log('colliding....');   
+                    console.log('colliding bottom....');   
                     return true;
                 }else{
                     continue;
@@ -108,8 +188,6 @@ function collide(arena,player){
             
         }
     }
-    
-   
 }
 
 
@@ -121,7 +199,8 @@ function playerDrop(){
     if(collide(arena,player)){ 
         player.pos.y--;
         merge(arena,player);
-        player.pos.y=0;
+        playerReset();
+        cancelRow();
     }
 
 }
