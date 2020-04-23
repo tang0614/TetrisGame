@@ -76,21 +76,29 @@ function collide(arena,player){
     const [ma,pos] = [player.matrix,player.pos];
   
     for(let i=0; i<ma.length; i++){
-        
         for(let j=0; j<ma[i].length; j++){
-            //matrix element is not zero
-            //arena is not zero
+            console.log([i,j]);
+            console.log('matrix value...');
+            console.log(ma[i][j]);
+    
+
             // if row do not exist, means out of canvas
             if(!arena[i+pos.y]){
                 console.log('out of bottom boundary');
-                return true;
+
+                if (ma[i][j] !==0){
+                    //when out of bound arena[i+pos.y][j+pos.x] is undefined
+                    console.log('colliding....');   
+                    return true;
+                }else{
+                    continue;
+                }
 
             }
             else{
                 if ((ma[i][j] !==0) &&(arena[i+pos.y][j+pos.x] !==0)){
                     //when out of bound arena[i+pos.y][j+pos.x] is undefined
-                    console.log('colliding....');
-                    
+                    console.log('colliding....');        
                     return true;
                 }else{
                     continue;
