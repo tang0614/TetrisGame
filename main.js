@@ -2,7 +2,7 @@ const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 
 context.scale(20,20);
-
+//*********************global variables*********************//
 const matrix_t =[
     [0,0,0],
     [1,1,1],
@@ -19,6 +19,8 @@ const player = {
 //create empty matrix filled with zero
 const arena = createMatrix(12,20);  
 
+
+//*********************functions*********************//
 function createMatrix(w,h){
     const matrix =[];
     while(h--){
@@ -76,7 +78,8 @@ function collide(arena,player){
             //matrix element is not zero
             //arena is not zero
             // if column, row do not exist, means out of canvas, also count as collide
-            if((i+pos.y>19)|(j+pos.x>12)){
+            if(i+pos.y>19){
+                console.log('outof boundary');
                 return true;
 
             }else{
@@ -97,41 +100,54 @@ function collide(arena,player){
 }
 
 
+function playerDrop(){
+    player.pos.y+=1;
+    drawCounter = 0;
 
+    if(collide(arena,player)){ 
+        player.pos.y--;
+        merge(arena,player);
+        player.pos.y=0;
+    }
+
+}
+
+function playerMove(dir){
+    player.pos.x+=dir
+    if(collide(arena,player)){ 
+        player.pos.x-=dir
+    }
+    
+}
 function draw(player){
     //only draw inside canvas size
 
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
     drawMatrix(player.matrix,player.pos);
+    drawMatrix(arena,{x:0,y:0});
     
 }
 
 let drawCounter = 0;
-let drawInterval = 1000; //this is one sec
+let drawInterval = 1000; //1000 is one sec
 let lastTime =0;
 
 function update(time=0){
     const dt = time - lastTime;
     drawCounter += dt;
+
     //update every one sec
     if(drawCounter > drawInterval){
         console.log('updating...');
-
-        player.pos.y+=1;
-        if(collide(arena,player)){
-            console.log('player.pos.y...');
-            console.log(player.pos.y);
-            player.pos.y--;
-            console.log('player.pos.y--...');
-            console.log(player.pos.y);
-            merge(arena,player);
-            console.table(arena);
-            player.pos.y=0;
-            console.log('player.pos.y=0...');
-            console.log(player.pos.y);
-        }
-        drawCounter = 0;
+        console.log('player.pos.x...');
+        console.log(player.pos.x);
+        console.log('player.pos.y...');
+        console.log(player.pos.y);
+        playerDrop();
+       
+        
+        console.table(arena);
     }
     
     draw(player);
@@ -143,12 +159,20 @@ function update(time=0){
 // keydown keyboard key is pressed down
 document.addEventListener('keydown', event=>{
     if(event.keyCode == 37){
-        player.pos.x-=1;
-
+        playerMove(-1);
+        // if(player.pos.x+player.matrix[0].length>3){
+        //     player.pos.x-=1;
+        // }
+        
+        
     }else if(event.keyCode == 39){
-        player.pos.x+=1;
+        playerMove(1);
+        // if(player.pos.x+player.matrix[0].length<12){
+        //     player.pos.x+=1;
+        // }
+   
     }else if(event.keyCode == 40){
-        player.pos.y+=1;
+        playerDrop();
     }
 })
 update();
