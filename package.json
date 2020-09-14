@@ -1,0 +1,27 @@
+{
+  "name": "tetrisgame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "v12.18.2",
+    "npm": "6.14.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tang0614/TetrisGame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tang0614/TetrisGame/issues"
+  },
+  "homepage": "https://github.com/tang0614/TetrisGame#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
