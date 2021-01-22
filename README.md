@@ -4,7 +4,7 @@
 
 ### Running
 * clone this repo
-* npm init, install dependencies
+* npm install 
 * npm start
 * go to local host
 
